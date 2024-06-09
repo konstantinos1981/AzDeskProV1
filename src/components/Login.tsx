@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Login: React.FC = () => {
+
+
+interface LoginProps {
+    csrfToken: string; // Define the CSRF token prop
+}
+
+
+
+const Login: React.FC<LoginProps> = ({ csrfToken }) => {
     const [formData, setFormData] = useState({
         username: '',
         password: ''
     });
+
+    const navigate = useNavigate();
+
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -14,10 +27,30 @@ const Login: React.FC = () => {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Handle form submission logic here
-        console.log('Form data submitted:', formData);
+        try {
+            const response = await fetch('http://localhost:8000/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken , // Pass CSRF token in the headers
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+
+            const data = await response.json();
+            console.log('Login successful:', data);
+            localStorage.setItem('token', data.token);
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Error during login:', error);
+            setError('Login failed. Please try again.');
+        }
     };
 
     return (
@@ -50,6 +83,7 @@ const Login: React.FC = () => {
                                 required
                             />
                         </div>
+                        {error && <div className="alert alert-danger">{error}</div>}
                         <button type="submit" className="btn btn-primary">Login</button>
                     </form>
                 </div>

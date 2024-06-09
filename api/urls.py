@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from django.views.generic import TemplateView
 from django.views.static import serve
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    re_path('admin/', admin.site.urls),
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
-    re_path(r"^.*$", TemplateView.as_view(template_name='base.html')),
+    #re_path(r"^.*$", TemplateView.as_view(template_name='base.html')),
+    re_path('accounts/', include('allauth.urls')),
+    re_path('api/', include('auth_user.urls')),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    
 ]

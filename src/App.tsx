@@ -12,9 +12,13 @@ import RequestDemo from './components/RequestDemo';
 import Newsletter from './components/Newsletter';
 import SendEmail from './components/SendEmail';
 import Careers from './components/Careers.tsx';
-import Dashboard from './components/Dashboard,.tsx';
+import Dashboard from './components/Dashboard.tsx';
 
-const App: React.FC = () => {
+interface AppProps {
+    csrfToken: string; // Define the csrfToken prop
+  }
+
+const App: React.FC<AppProps> = ({ csrfToken }) => {
     return (
         <Router>
             <NavbarComponent />
@@ -23,9 +27,9 @@ const App: React.FC = () => {
                     <Route path="/" element={<HomeComponent />} />
                     <Route path="/about" element={<AboutComponent />} />
                     <Route path="/contact" element={<ContactComponent />} />
-                    <Route path='/dashboard' element={<Dashboard/>} />
+                    <Route path='/dashboard' element={<Dashboard />} />
                     <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={<Login csrfToken={csrfToken}/>} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/faqs" element={<FAQs />} />
                     <Route path="/request-demo" element={<RequestDemo />} />
